@@ -64,59 +64,95 @@ function parseTime(input) {
   // Standardize input
   input = input.replace(",", ".");
 
-  // Handle cases like "::23.123", ":23.123", and "1::23.123"
-  const parts = input.split("::");
-  let hours = 0,
+  // Split input by ":"
+  const parts = input.split(":");
+  let days = 0,
+    hours = 0,
     minutes = 0,
-    seconds = 0;
-  let milliseconds = 0;
+    seconds = 0,
+    milliseconds = 0;
 
-  if (parts.length > 1) {
-    hours = parseInt(parts[0], 10) || 0; // Get hours from the first part
-    input = parts[1]; // Update input to the second part
+  // Check the length of parts
+  if (parts.length === 4) {
+    // If there are four parts, treat as days, hours, minutes, seconds
+    days = parseInt(parts[0], 10) || 0; // Get days
+    hours = parseInt(parts[1], 10) || 0; // Get hours
+    minutes = parseInt(parts[2], 10) || 0; // Get minutes
+    seconds = parseInt(parts[3].split(".")[0], 10) || 0; // Get seconds
+    milliseconds = parts[3].split(".")[1]
+      ? parseInt(parts[3].split(".")[1], 10)
+      : 0; // Get milliseconds
+  } else if (parts.length === 3) {
+    // If there are three parts, treat as hours, minutes, seconds
+    hours = parseInt(parts[0], 10) || 0; // Get hours
+    minutes = parseInt(parts[1], 10) || 0; // Get minutes
+    seconds = parseInt(parts[2].split(".")[0], 10) || 0; // Get seconds
+    milliseconds = parts[2].split(".")[1]
+      ? parseInt(parts[2].split(".")[1], 10)
+      : 0; // Get milliseconds
+  } else if (parts.length === 2) {
+    // If there are two parts, treat as minutes, seconds
+    minutes = parseInt(parts[0], 10) || 0; // Get minutes
+    seconds = parseInt(parts[1].split(".")[0], 10) || 0; // Get seconds
+    milliseconds = parts[1].split(".")[1]
+      ? parseInt(parts[1].split(".")[1], 10)
+      : 0; // Get milliseconds
+  } else {
+    // Default case (for seconds only)
+    seconds = parseInt(parts[0], 10) || 0;
+    milliseconds = parts[0].split(".")[1]
+      ? parseInt(parts[0].split(".")[1], 10)
+      : 0;
   }
 
-  if (input.startsWith(":")) {
-    input = "00:" + input.slice(1); // Add leading zeroes for minutes
-  } else if (input.startsWith("::")) {
-    input = "00:00:" + input.slice(2); // Add leading zeroes for hours and minutes
-  }
-
-  // Split the input into parts for minutes and seconds
-  let timeParts = input.split(".");
-  let timeSection = timeParts[0].split(":");
-
-  if (timeSection.length === 3) {
-    [hours, minutes, seconds] = timeSection.map((part) => parseInt(part, 10));
-  } else if (timeSection.length === 2) {
-    [minutes, seconds] = timeSection.map((part) => parseInt(part, 10));
-  } else if (timeSection.length === 1) {
-    seconds = parseInt(timeSection[0], 10);
-  }
-
-  milliseconds = timeParts[1] ? parseInt(timeParts[1], 10) : 0;
-
-  return (hours * 3600 + minutes * 60 + seconds) * 1000 + milliseconds;
+  // Convert all time to milliseconds
+  return (
+    (days * 24 * 3600 + hours * 3600 + minutes * 60 + seconds) * 1000 +
+    milliseconds
+  );
 }
 
-// Function to format input value on blur
+// Updated formatInput function to use the new formatTime function
 function formatInput(input) {
   const timeInMilliseconds = parseTime(input.value);
-  const hours = Math.floor(timeInMilliseconds / 3600000);
-  const minutes = Math.floor((timeInMilliseconds % 3600000) / 60000);
-  const seconds = Math.floor((timeInMilliseconds % 60000) / 1000);
-  const milliseconds = timeInMilliseconds % 1000;
-  input.value = formatTime(hours, minutes, seconds, milliseconds);
+  const totalDays = Math.floor(timeInMilliseconds / 86400000); // 24 * 60 * 60 * 1000
+  const remainingHours = Math.floor((timeInMilliseconds % 86400000) / 3600000); // 60 * 60 * 1000
+  const minutes = Math.floor((timeInMilliseconds % 3600000) / 60000); // 60 * 1000
+  const seconds = Math.floor((timeInMilliseconds % 60000) / 1000); // 1000
+  const milliseconds = timeInMilliseconds % 1000; // remaining milliseconds
+  input.value = formatTime(
+    totalDays,
+    remainingHours,
+    minutes,
+    seconds,
+    milliseconds
+  );
 }
 
-// Function to format time into hh:mm:ss,kkk
-function formatTime(hours, minutes, seconds, milliseconds) {
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0"
-  )}:${String(seconds).padStart(2, "0")},${String(milliseconds)
-    .toString()
-    .padStart(3, "0")}`;
+// Function to format time into dd:hh:mm:ss,kkk
+function formatTime(days, hours, minutes, seconds, milliseconds) {
+  // Calculate total hours
+  const totalHours = days * 24 + hours;
+
+  // If total hours exceed 24, return in dd:hh:mm:ss,kkk format
+  if (totalHours >= 24) {
+    return `${String(days).padStart(2, "0")}:${String(hours).padStart(
+      2,
+      "0"
+    )}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )},${String(milliseconds).padEnd(3, "0")}`;
+  } else {
+    // Otherwise return in hh:mm:ss,kkk format
+    return `${String(totalHours).padStart(2, "0")}:${String(minutes).padStart(
+      2,
+      "0"
+    )}:${String(seconds).padStart(2, "0")},${String(milliseconds).padEnd(
+      3,
+      "0"
+    )}`;
+  }
 }
 
 // Function to retrieve and parse all time inputs
@@ -135,13 +171,17 @@ function calculateSum() {
   const times = getTimes();
   const totalMilliseconds = times.reduce((acc, curr) => acc + curr, 0);
 
-  const hours = Math.floor(totalMilliseconds / 3600000);
-  const minutes = Math.floor((totalMilliseconds % 3600000) / 60000);
-  const seconds = Math.floor((totalMilliseconds % 60000) / 1000);
-  const milliseconds = totalMilliseconds % 1000;
+  // Calculate total time components
+  const totalDays = Math.floor(totalMilliseconds / 86400000); // 24 * 60 * 60 * 1000
+  const remainingHours = Math.floor((totalMilliseconds % 86400000) / 3600000); // 60 * 60 * 1000
+  const minutes = Math.floor((totalMilliseconds % 3600000) / 60000); // 60 * 1000
+  const seconds = Math.floor((totalMilliseconds % 60000) / 1000); // 1000
+  const milliseconds = totalMilliseconds % 1000; // remaining milliseconds
 
+  // Set result to formatted time
   document.getElementById("result").textContent = formatTime(
-    hours,
+    totalDays,
+    remainingHours,
     minutes,
     seconds,
     milliseconds
@@ -157,17 +197,17 @@ function calculateAverage() {
   const totalMilliseconds = times.reduce((acc, curr) => acc + curr, 0);
   const averageMilliseconds = totalMilliseconds / count;
 
-  // Round milliseconds to the nearest whole number
-  const roundedMilliseconds = Math.round(averageMilliseconds);
+  // Calculate average time components
+  const totalDays = Math.floor(averageMilliseconds / 86400000); // 24 * 60 * 60 * 1000
+  const remainingHours = Math.floor((averageMilliseconds % 86400000) / 3600000); // 60 * 60 * 1000
+  const minutes = Math.floor((averageMilliseconds % 3600000) / 60000); // 60 * 1000
+  const seconds = Math.floor((averageMilliseconds % 60000) / 1000); // 1000
+  const milliseconds = averageMilliseconds % 1000; // remaining milliseconds
 
-  const hours = Math.floor(roundedMilliseconds / 3600000);
-  const minutes = Math.floor((roundedMilliseconds % 3600000) / 60000);
-  const seconds = Math.floor((roundedMilliseconds % 60000) / 1000);
-  const milliseconds = roundedMilliseconds % 1000;
-
-  // Format the result
+  // Set result to formatted average time
   document.getElementById("result").textContent = formatTime(
-    hours,
+    totalDays,
+    remainingHours,
     minutes,
     seconds,
     milliseconds
@@ -194,19 +234,22 @@ function displayDifferences(differences) {
   differencesDiv.innerHTML = "";
 
   differences.forEach((difference, index) => {
-    const hours = Math.floor(difference / 3600000);
-    const minutes = Math.floor((difference % 3600000) / 60000);
-    const seconds = Math.floor((difference % 60000) / 1000);
-    const milliseconds = difference % 1000;
+    const totalDays = Math.floor(difference / 86400000); // 24 * 60 * 60 * 1000
+    const remainingHours = Math.floor((difference % 86400000) / 3600000); // 60 * 60 * 1000
+    const minutes = Math.floor((difference % 3600000) / 60000); // 60 * 1000
+    const seconds = Math.floor((difference % 60000) / 1000); // 1000
+    const milliseconds = difference % 1000; // remaining milliseconds
 
-    const differenceString = `Difference ${index + 1}: ${formatTime(
-      hours,
+    // Format the difference
+    const differenceString = formatTime(
+      totalDays,
+      remainingHours,
       minutes,
       seconds,
       milliseconds
-    )}`;
+    );
     const p = document.createElement("p");
-    p.textContent = differenceString;
+    p.textContent = `Difference ${index + 1}: ${differenceString}`;
     differencesDiv.appendChild(p);
   });
 }
