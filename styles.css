@@ -1,0 +1,137 @@
+/* Apply a modern font family */
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Center content and add some padding */
+h1 {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Container for input fields and buttons */
+#inputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
+
+/* Style each input container */
+.container {
+  margin: 10px;
+}
+
+/* Style the labels and inputs */
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.time-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+  font-size: 16px;
+}
+
+/* Container for buttons */
+.button-container {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+/* Style the buttons */
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  flex: 0 0 auto;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Style the result section */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#result {
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Style the differences section */
+#differences {
+  margin: 20px auto;
+  width: 90%;
+  max-width: 600px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Style the delete buttons */
+.delete-button {
+  background: none;
+  border: none;
+  color: #ff0000;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 10px;
+  padding: 0;
+}
+
+.delete-button:hover {
+  color: #cc0000;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 500px) {
+  #inputContainer {
+    flex-direction: column;
+  }
+
+  .container {
+    width: 100%;
+    text-align: center;
+  }
+
+  .time-input {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .button-container {
+    overflow-x: auto;
+  }
+
+  button {
+    flex: 0 0 auto;
+    max-width: none;
+    margin: 2px;
+    font-size: 11px;
+  }
+}

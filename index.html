@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Time Operations</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Time Operations</h1>
+    <div id="inputContainer">
+      <div class="container">
+        <label for="time1">Time 1:</label>
+        <input
+          type="text"
+          id="time1"
+          class="time-input"
+          placeholder="Enter Time"
+          onblur="formatInput(this)"
+          onclick="this.select()"
+          value="00:00:00,000"
+        />
+        <button type="button" class="delete-button" onclick="deleteInput(this)">
+          &#10005;
+        </button>
+      </div>
+      <div class="container">
+        <label for="time2">Time 2:</label>
+        <input
+          type="text"
+          id="time2"
+          class="time-input"
+          placeholder="Enter Time"
+          onblur="formatInput(this)"
+          onclick="this.select()"
+          value="00:00:00,000"
+        />
+        <button type="button" class="delete-button" onclick="deleteInput(this)">
+          &#10005;
+        </button>
+      </div>
+    </div>
+    <div class="button-container">
+      <button onclick="addInput()">Add Time</button>
+      <button onclick="calculateSum()">Sum</button>
+      <button onclick="calculateAverage()">Average</button>
+      <button onclick="calculateDifference()">Difference</button>
+    </div>
+    <h2>Result: <span id="result"></span></h2>
+    <div id="differences"></div>
+    <script src="scripts.js"></script>
+  </body>
+</html>
