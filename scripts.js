@@ -64,23 +64,37 @@ function parseTime(input) {
   // Standardize input
   input = input.replace(",", ".");
 
-  // Split the input into parts
-  let [timePart, milliseconds] = input.split(".");
-  let parts = timePart.split(":");
-
+  // Handle cases like "::23.123", ":23.123", and "1::23.123"
+  const parts = input.split("::");
   let hours = 0,
     minutes = 0,
     seconds = 0;
+  let milliseconds = 0;
 
-  if (parts.length === 3) {
-    [hours, minutes, seconds] = parts.map((part) => parseInt(part, 10));
-  } else if (parts.length === 2) {
-    [minutes, seconds] = parts.map((part) => parseInt(part, 10));
-  } else if (parts.length === 1) {
-    seconds = parseInt(parts[0], 10);
+  if (parts.length > 1) {
+    hours = parseInt(parts[0], 10) || 0; // Get hours from the first part
+    input = parts[1]; // Update input to the second part
   }
 
-  milliseconds = milliseconds ? parseInt(milliseconds, 10) : 0;
+  if (input.startsWith(":")) {
+    input = "00:" + input.slice(1); // Add leading zeroes for minutes
+  } else if (input.startsWith("::")) {
+    input = "00:00:" + input.slice(2); // Add leading zeroes for hours and minutes
+  }
+
+  // Split the input into parts for minutes and seconds
+  let timeParts = input.split(".");
+  let timeSection = timeParts[0].split(":");
+
+  if (timeSection.length === 3) {
+    [hours, minutes, seconds] = timeSection.map((part) => parseInt(part, 10));
+  } else if (timeSection.length === 2) {
+    [minutes, seconds] = timeSection.map((part) => parseInt(part, 10));
+  } else if (timeSection.length === 1) {
+    seconds = parseInt(timeSection[0], 10);
+  }
+
+  milliseconds = timeParts[1] ? parseInt(timeParts[1], 10) : 0;
 
   return (hours * 3600 + minutes * 60 + seconds) * 1000 + milliseconds;
 }
@@ -93,6 +107,16 @@ function formatInput(input) {
   const seconds = Math.floor((timeInMilliseconds % 60000) / 1000);
   const milliseconds = timeInMilliseconds % 1000;
   input.value = formatTime(hours, minutes, seconds, milliseconds);
+}
+
+// Function to format time into hh:mm:ss,kkk
+function formatTime(hours, minutes, seconds, milliseconds) {
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+    2,
+    "0"
+  )}:${String(seconds).padStart(2, "0")},${String(milliseconds)
+    .toString()
+    .padStart(3, "0")}`;
 }
 
 // Function to retrieve and parse all time inputs
