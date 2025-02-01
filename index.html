@@ -20,6 +20,8 @@
           onblur="formatInput(this)"
           onclick="this.select()"
           value="00:00:00,000"
+          inputmode="numeric"
+          pattern="[0-9:,.]*"
         />
         <button type="button" class="delete-button" onclick="deleteInput(this)">
           &#10005;
@@ -35,6 +37,8 @@
           onblur="formatInput(this)"
           onclick="this.select()"
           value="00:00:00,000"
+          inputmode="numeric"
+          pattern="[0-9:,.]*"
         />
         <button type="button" class="delete-button" onclick="deleteInput(this)">
           &#10005;
