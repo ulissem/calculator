@@ -18,7 +18,7 @@ function addInput() {
 
   container.innerHTML = `
           <label for="time${inputCount}">Time ${inputCount}:</label>
-          <input type="text" id="time${inputCount}" class="time-input" placeholder="hh:mm:ss,kkk or seconds" onblur="formatInput(this)" onclick="this.select()" value="00:00:00,000">
+          <input type="text" id="time${inputCount}" class="time-input" placeholder="hh:mm:ss,kkk or seconds" onblur="formatInput(this)" onclick="this.select()" value="00:00:00,000" inputmode="numeric" pattern="[0-9:,.]*">
           <button type="button" class="delete-button" onclick="deleteInput(this)">&#10005;</button>
       `;
 
@@ -114,12 +114,15 @@ function parseTime(input) {
 
 // Updated formatInput function to use the new formatTime function
 function formatInput(input) {
+  input.value = input.value.replace(/\./g, ":"); // Replace all dots with colons
+
   const timeInMilliseconds = parseTime(input.value);
   const totalDays = Math.floor(timeInMilliseconds / 86400000); // 24 * 60 * 60 * 1000
   const remainingHours = Math.floor((timeInMilliseconds % 86400000) / 3600000); // 60 * 60 * 1000
   const minutes = Math.floor((timeInMilliseconds % 3600000) / 60000); // 60 * 1000
   const seconds = Math.floor((timeInMilliseconds % 60000) / 1000); // 1000
   const milliseconds = timeInMilliseconds % 1000; // remaining milliseconds
+
   input.value = formatTime(
     totalDays,
     remainingHours,
@@ -160,6 +163,7 @@ function getTimes() {
   const inputs = document.querySelectorAll(".time-input");
   const times = [];
   inputs.forEach((input) => {
+    input.value = input.value.replace(/\./g, ":"); // Ensure dots are replaced before parsing
     const timeInMilliseconds = parseTime(input.value);
     times.push(timeInMilliseconds);
   });
@@ -261,5 +265,28 @@ document.addEventListener("DOMContentLoaded", () => {
   existingInputs.forEach((input) => {
     input.addEventListener("blur", () => formatInput(input));
     input.addEventListener("click", () => input.select()); // Add click event to select text
+  });
+});
+
+// Show hint only when using mobile with virtual keyboard
+
+function showHintOnMobile(input) {
+  const hint = document.getElementById("mobileHint");
+
+  if (window.innerWidth <= 768) {
+    // Adjust this value for tablets if needed
+    hint.style.display = "block"; // Show the hint
+  }
+}
+
+function hideHint() {
+  const hint = document.getElementById("mobileHint");
+  hint.style.display = "none"; // Hide the hint when input loses focus
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".time-input").forEach((input) => {
+    input.addEventListener("focus", () => showHintOnMobile(input));
+    input.addEventListener("blur", hideHint);
   });
 });

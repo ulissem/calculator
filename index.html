@@ -10,10 +10,14 @@
   <body>
     <h1>Time Calculator</h1>
     <div id="inputContainer">
+      <p id="mobileHint" class="hint-text">
+        Use <strong>"."</strong> to separate HH:MM:SS and
+        <strong>","</strong> for milliseconds.
+      </p>
       <div class="container">
         <label for="time1">Time 1:</label>
         <input
-          type="tel"
+          type="text"
           id="time1"
           class="time-input"
           placeholder="Enter Time"
@@ -30,7 +34,7 @@
       <div class="container">
         <label for="time2">Time 2:</label>
         <input
-          type="tel"
+          type="text"
           id="time2"
           class="time-input"
           placeholder="Enter Time"

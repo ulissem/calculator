@@ -108,6 +108,22 @@ h2 {
   color: #cc0000;
 }
 
+.hint-text {
+  display: none; /* Hidden by default */
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+  text-align: center;
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: fit-content;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 500px) {
   #inputContainer {
